@@ -5,10 +5,12 @@ VOLUME /var/games/minecraft
 # Arbitrarily assigned ports for 5 servers. change if you need to.
 EXPOSE 22 8443 25565-25569
 
-#i want jdk8, so enable debian testing
-RUN echo "deb http://ftp.us.debian.org/debian/ testing main" >> /etc/apt/sources.list
 
-#update and accept all prompts
+# -- Update, install packages and clean-up --
+
+RUN echo "deb http://ftp.us.debian.org/debian/ testing main" >> /etc/apt/sources.list
+# Add testing so we have access to JDK 8
+
 RUN apt-get update -y && apt-get install -y \
   sudo \
   openssh-server \
@@ -35,4 +37,20 @@ COPY *.sh ./
 RUN chmod +x *.sh
 RUN useradd -s /bin/bash -d /usr/games/minecraft -m minecraft
 
+
+# -- Install Spigot --
+
+WORKDIR /var/games/minecraft
+			 
+ADD https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar \
+    profiles/BuildTools-latest/BuildTools.jar
+
+RUN mkdir -pv profiles/spigot_1.8.8; \
+    cd profiles/spigot_1.8.8; \
+    /usr/bin/java -jar ../BuildTools-latest/BuildTools.jar 
+
+
+# -- Container initialization --
+
+WORKDIR /usr/games/minecraft
 ENTRYPOINT ["./start.sh"]
