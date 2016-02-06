@@ -1,10 +1,7 @@
 FROM node:5
 
-VOLUME /var/games/minecraft
-
 # Arbitrarily assigned ports for 5 servers. change if you need to.
 EXPOSE 22 8443 25565-25569
-
 
 # -- Update, install packages and clean-up --
 
