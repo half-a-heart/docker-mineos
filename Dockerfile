@@ -32,8 +32,11 @@ COPY init/supervisord/* /etc/supervisor/conf.d/
 COPY *.sh ./
 
 RUN chmod +x *.sh
-RUN useradd -s /bin/bash -d /usr/games/minecraft -m minecraft
 
+# Add minecraft user and change owner files.
+RUN useradd -s /bin/bash -d /usr/games/minecraft -m minecraft; \
+    usermod -G sudo minecraft; \
+    sed -i 's/%sudo.*/%sudo   ALL=(ALL:ALL) NOPASSWD:ALL/' /etc/sudoers
 
 # -- Install Spigot --
 
